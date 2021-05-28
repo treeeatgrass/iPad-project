@@ -1,0 +1,104 @@
+---
+title: "Script for Elsa"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# install.packages("here")
+# install.packages("tidyverse")
+# install.packages("rstatix")
+
+library(here)
+library(tidyverse)
+library(rstatix)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, echo= FALSE, message=FALSE}
+df1 <- read.csv(here("iPadProjectData_ElsaEdit.csv"))
+df2 <- read.csv(here("iPadExperiment.csv"))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r echo= FALSE, message=FALSE}
+df1 <- df1 %>% 
+  mutate(BIF1 = case_when(Q1 == 1 ~ 1, Q1 == 2 ~ 0)) %>%
+  mutate(BIF2 = case_when(Q2 == 2 ~ 1, Q2 == 1 ~ 0)) %>%
+  mutate(BIF3 = case_when(Q3 == 1 ~ 1, Q3 == 2 ~ 0)) %>%
+  mutate(BIF4 = case_when(Q4 == 1 ~ 1, Q4 == 2 ~ 0)) %>%
+  mutate(BIF5 = case_when(Q5 == 1 ~ 1, Q5 == 2 ~ 0)) %>%
+  mutate(BIF6 = case_when(Q6 == 2 ~ 1, Q6 == 1 ~ 0)) %>%
+  mutate(BIF7 = case_when(Q7 == 1 ~ 1, Q7 == 2 ~ 0)) %>%
+  mutate(BIF8 = case_when(Q8 == 1 ~ 1, Q8 == 2 ~ 0)) %>%
+  mutate(BIF9 = case_when(Q9 == 2 ~ 1, Q9 == 1 ~ 0)) %>%
+  mutate(BIF10 = case_when(Q10 == 1 ~ 1, Q10 == 2 ~ 0)) %>%
+  mutate(BIF11 = case_when(Q11 == 2 ~ 1, Q11 == 1 ~ 0)) %>%
+  mutate(BIF12 = case_when(Q12 == 2 ~ 1, Q12 == 1 ~ 0)) %>%
+  mutate(BIF13 = case_when(Q13 == 1 ~ 1, Q13 == 2 ~ 0)) %>%
+  mutate(BIF14 = case_when(Q14 == 1 ~ 1, Q14 == 2 ~ 0)) %>%
+  mutate(BIF15 = case_when(Q15 == 2 ~ 1, Q15 == 1 ~ 0)) %>%
+  mutate(BIF16 = case_when(Q16 == 1 ~ 1, Q16 == 2 ~ 0)) %>%
+  mutate(BIF17 = case_when(Q17 == 2 ~ 1, Q17 == 1 ~ 0)) %>%
+  mutate(BIF18 = case_when(Q18 == 2 ~ 1, Q18 == 1 ~ 0)) %>%
+  mutate(BIF19 = case_when(Q19 == 2 ~ 1, Q19 == 1 ~ 0)) %>%
+  mutate(BIF20 = case_when(Q20 == 1 ~ 1, Q20 == 2 ~ 0)) %>%
+  mutate(BIF21 = case_when(Q21 == 2 ~ 1, Q21 == 1 ~ 0)) %>%
+  mutate(BIF22 = case_when(Q22 == 2 ~ 1, Q22 == 1 ~ 0)) %>%
+  mutate(BIF23 = case_when(Q23 == 1 ~ 1, Q23 == 2 ~ 0)) %>%
+  mutate(BIF24 = case_when(Q24 == 1 ~ 1, Q24 == 2 ~ 0)) %>%
+  mutate(BIF25 = case_when(Q25 == 2 ~ 1, Q25 == 1 ~ 0)) 
+
+df1 <- df1 %>% 
+  mutate(BIF = rowSums(df1[,c('BIF1','BIF2','BIF3','BIF4','BIF5',
+                                'BIF6','BIF7','BIF8','BIF9','BIF10',
+                                'BIF11','BIF12','BIF13','BIF14','BIF15',
+                                'BIF16','BIF17','BIF18','BIF19','BIF20',
+                                'BIF21','BIF22','BIF23','BIF24','BIF25')], na.rm=TRUE))
+```
+
+
+```{r, echo= FALSE, message=FALSE}
+data1 <- df1 %>% 
+  select(ID, BIF)
+
+
+data2 <- df2 %>% 
+  select(ID, Frequency, Media, SAT, SATdetail, SATabstract, Age, Gender) 
+
+df <- left_join(data2, data1, by = "ID")
+```
+
+
+
+```{r echo= FALSE, message=FALSE}
+
+#compare the iPad group with paper group regarding SAT scores
+model1 <- lm(SAT ~ Media, data = df)
+model3 <- lm(SATdetail ~ Media, data = df)
+model4 <- lm(SATabstract ~ Media, data = df)
+
+summary(model1)
+summary(model3)
+summary(model4)
+```
+
+```{r echo= FALSE, message=FALSE}
+grouped <- df %>% 
+    group_by(Media) %>%
+    summarise(
+    count = n(),
+    mean = mean(SATabstract, na.rm = TRUE),
+    sd = sd(SATabstract, na.rm = TRUE)
+)
+grouped$mean
+grouped$sd
+```
+
